@@ -14,3 +14,13 @@ class BancoBase:
         conta = Conta(numero)
         self._contas[numero] = conta
         return conta
+    
+    def localizar_conta(self, numero):
+        numero = str(numero).strip()
+        conta = self._contas.get(numero)
+        if conta is None:
+            raise ValueError(f"A conta {numero} não existe.")
+        return conta
+
+    def consultar_saldo(self, numero):
+        return self.localizar_conta(numero).saldo
