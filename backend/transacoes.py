@@ -1,63 +1,32 @@
-class Conta:
-    def __init__(self, numero):
-        self.numero = numero
-        self.saldo = 0.0
-class Transacoes:
-    def __init__(self, contas):
-        self.contas = contas
 
-    def credito(self, numero, valor):
-        conta = self.contas.get(numero)
+def creditar(banco, numero, valor):
+    """Adiciona dinheiro ao saldo de uma conta."""
+    if valor <= 0:
+        raise ValueError("O valor deve ser maior que zero.")
 
-        if conta is None:
-            print("Conta não encontrada.")
-            return False
+    conta = banco.localizar_conta(numero)
+    conta.saldo += valor
 
-        if valor <= 0:
-            print("O valor deve ser maior que zero.")
-            return False
 
-        conta.saldo += valor
+def debitar(banco, numero, valor):
+    """Retira dinheiro do saldo de uma conta."""
+    if valor <= 0:
+        raise ValueError("O valor deve ser maior que zero.")
 
-        print("Crédito realizado com sucesso!")
-        print(f"Novo saldo: R$ {conta.saldo:.2f}")
-        return True
+    conta = banco.localizar_conta(numero)
+    conta.saldo -= valor
 
-    def debito(self, numero, valor):
-        conta = self.contas.get(numero)
 
-        if conta is None:
-            print("Conta não encontrada.")
-            return False
+def transferir(banco, origem, destino, valor):
+    """Transfere dinheiro entre duas contas."""
+    if valor <= 0:
+        raise ValueError("O valor deve ser maior que zero.")
 
-        if valor <= 0:
-            print("O valor deve ser maior que zero.")
-            return False
+    if str(origem).strip() == str(destino).strip():
+        raise ValueError("As contas devem ser diferentes.")
 
-        conta.saldo -= valor
+    conta_origem = banco.localizar_conta(origem)
+    conta_destino = banco.localizar_conta(destino)
 
-        print("Débito realizado com sucesso!")
-        print(f"Novo saldo: R$ {conta.saldo:.2f}")
-        return True
-
-    def transferir(self, origem_numero, destino_numero, valor):
-        origem = self.contas.get(origem_numero)
-        destino = self.contas.get(destino_numero)
-
-        if origem is None:
-            print("Conta de origem não encontrada.")
-            return False
-
-        if destino is None:
-            print("Conta de destino não encontrada.")
-            return False
-
-        if valor <= 0:
-            print("O valor deve ser maior que zero.")
-            return False
-
-        origem.saldo -= valor
-        destino.saldo += valor
-
-        print("Transferência realizada com sucesso!")
-        return True
+    conta_origem.saldo -= valor
+    conta_destino.saldo += valor
