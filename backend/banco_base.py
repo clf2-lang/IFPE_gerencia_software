@@ -1,6 +1,5 @@
 from backend.conta import Conta
 
-
 class BancoBase:
     def __init__(self):
         self._contas = {}
@@ -14,7 +13,7 @@ class BancoBase:
         conta = Conta(numero)
         self._contas[numero] = conta
         return conta
-
+    
     def localizar_conta(self, numero):
         numero = str(numero).strip()
         conta = self._contas.get(numero)
@@ -24,3 +23,4 @@ class BancoBase:
 
     def consultar_saldo(self, numero):
         return self.localizar_conta(numero).saldo
+
