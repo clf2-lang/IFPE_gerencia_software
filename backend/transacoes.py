@@ -14,7 +14,13 @@ def debitar(banco, numero, valor):
         raise ValueError("O valor deve ser maior que zero.")
 
     conta = banco.localizar_conta(numero)
-    conta.saldo -= valor
+    
+    # Verifica se há saldo suficiente antes de debitar o valor
+    if conta.saldo >= valor:
+        conta.saldo -= valor
+    else:
+        raise ValueError("Saldo insuficiente para debitar o valor solicitado.")
+    
 
 
 def transferir(banco, origem, destino, valor):
@@ -28,5 +34,9 @@ def transferir(banco, origem, destino, valor):
     conta_origem = banco.localizar_conta(origem)
     conta_destino = banco.localizar_conta(destino)
 
-    conta_origem.saldo -= valor
-    conta_destino.saldo += valor
+    # Verifica se a conta de origem tem saldo suficiente antes de transferir
+    if conta_origem.saldo >= valor:
+        conta_origem.saldo -= valor
+        conta_destino.saldo += valor
+    else:
+        raise ValueError("Saldo insuficiente para transferir o valor solicitado.")
