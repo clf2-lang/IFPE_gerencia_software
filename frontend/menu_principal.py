@@ -22,7 +22,19 @@ def _ler_valor(mensagem):
 
 def _cadastrar_conta(banco):
     numero = _ler_numero_conta("Número da conta: ")
-    conta = banco.cadastrar_conta(numero)
+    print("1 - Conta Corrente")
+    print("2 - Conta Bônus")
+    print("3 - Conta Poupança")
+    opcao = input("Escolha o tipo de conta: ").strip()
+    tipos = {
+        "1": "corrente",
+        "2": "bonus",
+        "3": "poupanca",
+    }
+    tipo = tipos.get(opcao)
+    if tipo is None:
+        raise ValueError("Tipo de conta inválido.")
+    conta = banco.cadastrar_conta(numero, tipo)
     print(f"Conta {conta.numero} cadastrada com saldo R$ {conta.saldo:.2f}.")
 
 
@@ -54,6 +66,16 @@ def _realizar_transferencia(banco):
     print("Transferência realizada com sucesso.")
 
 
+def _render_juros(banco):
+    numero = _ler_numero_conta("Número da conta Poupança: ")
+    taxa = _ler_valor("Taxa de juros (%): ")
+    banco.render_juros(numero, taxa)
+    print(
+        f"Juros aplicados com sucesso. Saldo atual: "
+        f"R$ {banco.consultar_saldo(numero):.2f}."
+    )
+
+
 def _mostrar_menu():
     print("\n=== Sistema Bancário IFPE ===")
     print("1. Cadastrar conta")
@@ -61,6 +83,7 @@ def _mostrar_menu():
     print("3. Crédito")
     print("4. Débito")
     print("5. Transferência")
+    print("6. Render Juros")
     print("0. Sair")
 
 
@@ -72,6 +95,7 @@ def executar_menu():
         "3": _realizar_credito,
         "4": _realizar_debito,
         "5": _realizar_transferencia,
+        "6": _render_juros,
     }
     while True:
         _mostrar_menu()
