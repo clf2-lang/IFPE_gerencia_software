@@ -4,7 +4,7 @@ class BancoBase:
     def __init__(self):
         self.contas = []
 
-    def cadastrar_conta(self, numero, tipo):
+    def cadastrar_conta(self, numero, tipo, saldo_inicial=0.0):
         numero = str(numero).strip()
         if not numero:
             raise ValueError("O número da conta não pode ficar vazio.")
@@ -16,7 +16,7 @@ class BancoBase:
         elif tipo == "bonus":
             conta = ContaBonus(numero)
         elif tipo == "poupanca":
-            conta = ContaPoupanca(numero)
+            conta = ContaPoupanca(numero, saldo_inicial)
         else:
             raise ValueError("Tipo de conta inválido.")
 
