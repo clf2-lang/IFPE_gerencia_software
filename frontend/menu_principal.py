@@ -1,5 +1,5 @@
 from backend.banco_base import BancoBase
-#from backend.transacoes import creditar, debitar, transferir
+from backend.transacoes import creditar, debitar, transferir
 
 # Interface principal do sistema bancário
 def _ler_numero_conta(mensagem):

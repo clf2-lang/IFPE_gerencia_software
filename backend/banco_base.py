@@ -1,4 +1,3 @@
-
 from backend.conta import Conta
 
 class BancoBase:
@@ -24,3 +23,4 @@ class BancoBase:
 
     def consultar_saldo(self, numero):
         return self.localizar_conta(numero).saldo
+
