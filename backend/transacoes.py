@@ -1,5 +1,6 @@
+
 def creditar(banco, numero, valor):
-    """Adiciona dinheiro ao saldo de uma conta."""
+    # Verifica se o valor é positivo antes de creditar
     if valor <= 0:
         raise ValueError("O valor deve ser maior que zero.")
 
@@ -12,7 +13,7 @@ def creditar(banco, numero, valor):
 
 
 def debitar(banco, numero, valor):
-    """Retira dinheiro do saldo de uma conta."""
+    # Verifica se há saldo suficiente antes de debitar o valor
     if valor <= 0:
         raise ValueError("O valor deve ser maior que zero.")
 
@@ -25,7 +26,7 @@ def debitar(banco, numero, valor):
 
 
 def transferir(banco, origem, destino, valor):
-    """Transfere dinheiro entre duas contas."""
+    # Verifica se o valor é positivo antes de transferir
     if valor <= 0:
         raise ValueError("O valor deve ser maior que zero.")
 
