@@ -41,7 +41,6 @@ def transferir(banco, origem, destino, valor):
     conta_origem.saldo -= valor
     conta_destino.saldo += valor
 
-    # Conta Bônus ganha 1 ponto a cada R$ 200 recebidos
+    # Conta Bônus ganha 1 ponto a cada R$ 150 recebidos
     if hasattr(conta_destino, "pontuacao"):
-        conta_destino.pontuacao += int(valor / 200)
-
+        conta_destino.pontuacao += int(valor / 150)
