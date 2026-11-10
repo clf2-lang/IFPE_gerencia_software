@@ -2,6 +2,7 @@ class Conta:
     def __init__(self, numero):
         self.numero = numero
         self.saldo = 0.0
+        self.limite = -1000.0
 
 
 class ContaBonus(Conta):
@@ -14,6 +15,7 @@ class ContaPoupanca(Conta):
     def __init__(self, numero, saldo_inicial=0.0):
         super().__init__(numero)
         self.saldo = saldo_inicial
+        self.limite = 0.0
 
     def render_juros(self, taxa):
         juros = self.saldo * (taxa / 100)
