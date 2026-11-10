@@ -34,7 +34,11 @@ def _cadastrar_conta(banco):
     tipo = tipos.get(opcao)
     if tipo is None:
         raise ValueError("Tipo de conta inválido.")
-    conta = banco.cadastrar_conta(numero, tipo)
+    if tipo == "corrente":
+        saldo_inicial = _ler_valor("Digite o saldo inicial: ")
+    else:
+        saldo_inicial = 0.0
+    conta = banco.cadastrar_conta(numero, tipo, saldo_inicial)
     print(f"Conta {conta.numero} cadastrada com saldo R$ {conta.saldo:.2f}.")
 
 
