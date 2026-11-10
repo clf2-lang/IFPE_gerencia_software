@@ -18,8 +18,8 @@ def debitar(banco, numero, valor):
 
     conta = banco.localizar_conta(numero)
 
-    if conta.saldo < valor:
-        raise ValueError("Saldo insuficiente para debitar o valor solicitado.")
+    if (conta.saldo - valor) < getattr(conta, 'limite', 0.0):
+        raise ValueError("O limite de saldo negativo foi ultrapassado.")
 
     conta.saldo -= valor
 
@@ -35,8 +35,8 @@ def transferir(banco, origem, destino, valor):
     conta_origem = banco.localizar_conta(origem)
     conta_destino = banco.localizar_conta(destino)
 
-    if conta_origem.saldo < valor:
-        raise ValueError("Saldo insuficiente para transferir o valor solicitado.")
+    if (conta_origem.saldo - valor) < getattr(conta_origem, 'limite', 0.0):
+        raise ValueError("O limite de saldo negativo foi ultrapassado.")
 
     conta_origem.saldo -= valor
     conta_destino.saldo += valor
@@ -44,4 +44,3 @@ def transferir(banco, origem, destino, valor):
     # Conta Bônus ganha 1 ponto a cada R$ 200 recebidos
     if hasattr(conta_destino, "pontuacao"):
         conta_destino.pontuacao += int(valor / 200)
-
