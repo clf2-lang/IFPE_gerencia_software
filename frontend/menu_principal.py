@@ -48,6 +48,16 @@ def _consultar_saldo(banco):
     print(f"Saldo da conta {numero}: R$ {saldo:.2f}.")
 
 
+def _consultar_conta(banco):
+    numero = _ler_numero_conta("Número da conta: ")
+    dados = banco.consultar_conta(numero)
+    print(f"Tipo: {dados['tipo']}")
+    print(f"Número: {dados['numero']}")
+    print(f"Saldo: R$ {dados['saldo']:.2f}")
+    if "bonus" in dados:
+        print(f"Bônus: {dados['bonus']}")
+
+
 def _realizar_credito(banco):
     numero = _ler_numero_conta("Número da conta: ")
     valor = _ler_valor("Valor do crédito: ")
@@ -88,6 +98,7 @@ def _mostrar_menu():
     print("4. Débito")
     print("5. Transferência")
     print("6. Render Juros")
+    print("7. Consultar conta")
     print("0. Sair")
 
 
@@ -100,6 +111,7 @@ def executar_menu():
         "4": _realizar_debito,
         "5": _realizar_transferencia,
         "6": _render_juros,
+        "7": _consultar_conta,
     }
     while True:
         _mostrar_menu()
