@@ -33,6 +33,27 @@ class BancoBase:
     def consultar_saldo(self, numero):
         return self.localizar_conta(numero).saldo
 
+    def consultar_conta(self, numero):
+        conta = self.localizar_conta(numero)
+
+        if isinstance(conta, ContaBonus):
+            tipo = "bonus"
+        elif isinstance(conta, ContaPoupanca):
+            tipo = "poupanca"
+        else:
+            tipo = "corrente"
+
+        dados = {
+            "tipo": tipo,
+            "numero": conta.numero,
+            "saldo": conta.saldo,
+        }
+
+        if hasattr(conta, "pontuacao"):
+            dados["bonus"] = conta.pontuacao
+
+        return dados
+
     def render_juros(self, numero, taxa):
         conta = self.localizar_conta(numero)
         if isinstance(conta, ContaPoupanca):
