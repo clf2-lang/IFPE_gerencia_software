@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 
 from backend.banco_base import BancoBase
+from backend.transacoes import creditar, debitar
 
 
 app = Flask(__name__)
@@ -45,3 +46,68 @@ def consultar_conta():
         return jsonify(resultado), 200
     except ValueError as erro:
         return jsonify({"mensagem": str(erro)}), 404
+
+
+@app.get("/banco/conta/<id>/saldo")
+def consultar_saldo(id):
+    try:
+        saldo = banco.consultar_saldo(id)
+        return jsonify({"saldo": saldo}), 200
+    except ValueError as erro:
+        return jsonify({"mensagem": str(erro)}), 404
+
+
+@app.put("/banco/conta/<id>/credito")
+def realizar_credito(id):
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({"mensagem": "JSON inválido."}), 400
+
+    valor = dados.get("valor", dados.get("amount"))
+    if valor is None:
+        return jsonify({"mensagem": "O valor informado não é válido."}), 400
+
+    try:
+        valor = float(valor)
+    except (ValueError, TypeError):
+        return jsonify({"mensagem": "O valor informado não é válido."}), 400
+
+    try:
+        banco.localizar_conta(id)
+    except ValueError as erro:
+        return jsonify({"mensagem": str(erro)}), 404
+
+    try:
+        creditar(banco, id, valor)
+        saldo = banco.consultar_saldo(id)
+        return jsonify({"saldo": saldo}), 200
+    except ValueError as erro:
+        return jsonify({"mensagem": str(erro)}), 400
+
+
+@app.put("/banco/conta/<id>/debito")
+def realizar_debito(id):
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({"mensagem": "JSON inválido."}), 400
+
+    valor = dados.get("valor", dados.get("amount"))
+    if valor is None:
+        return jsonify({"mensagem": "O valor informado não é válido."}), 400
+
+    try:
+        valor = float(valor)
+    except (ValueError, TypeError):
+        return jsonify({"mensagem": "O valor informado não é válido."}), 400
+
+    try:
+        banco.localizar_conta(id)
+    except ValueError as erro:
+        return jsonify({"mensagem": str(erro)}), 404
+
+    try:
+        debitar(banco, id, valor)
+        saldo = banco.consultar_saldo(id)
+        return jsonify({"saldo": saldo}), 200
+    except ValueError as erro:
+        return jsonify({"mensagem": str(erro)}), 400
