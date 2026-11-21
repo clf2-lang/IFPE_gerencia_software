@@ -1,7 +1,10 @@
-from backend.banco_base import BancoBase
-from backend.transacoes import creditar, debitar, transferir
+import requests
 
-# Interface principal do sistema bancário
+
+API_URL = "http://127.0.0.1:5000"
+
+
+# Interface principal do sistema bancario
 def _ler_numero_conta(mensagem):
     numero = input(mensagem).strip()
     if not numero:
@@ -20,7 +23,26 @@ def _ler_valor(mensagem):
     return valor
 
 
-def _cadastrar_conta(banco):
+def _chamar_api(method, caminho, **kwargs):
+    try:
+        resposta = requests.request(
+            method,
+            f"{API_URL}{caminho}",
+            timeout=5,
+            **kwargs
+        )
+    except requests.RequestException:
+        raise ValueError("Não foi possível conectar ao servidor.")
+
+    dados = resposta.json() if resposta.content else {}
+    if resposta.status_code in (400, 404):
+        raise ValueError(dados.get("mensagem", "Operação não realizada."))
+    if not resposta.ok:
+        raise ValueError("Erro ao comunicar com o servidor.")
+    return dados
+
+
+def _cadastrar_conta():
     numero = _ler_numero_conta("Número da conta: ")
     print("1 - Conta Corrente")
     print("2 - Conta Bônus")
@@ -34,23 +56,25 @@ def _cadastrar_conta(banco):
     tipo = tipos.get(opcao)
     if tipo is None:
         raise ValueError("Tipo de conta inválido.")
-    elif tipo == "poupanca":
+
+    dados = {"numero": numero, "tipo": tipo}
+    if tipo == "poupanca":
         saldo_inicial = _ler_valor("Saldo inicial da conta Poupança: ")
-        conta = banco.cadastrar_conta(numero, tipo, saldo_inicial)
-    else:
-        conta = banco.cadastrar_conta(numero, tipo)
-    print(f"Conta {conta.numero} cadastrada com saldo R$ {conta.saldo:.2f}.")
+        dados["saldo_inicial"] = saldo_inicial
+
+    conta = _chamar_api("POST", "/banco/conta/", json=dados)
+    print(f"Conta {conta['numero']} cadastrada com saldo R$ {conta['saldo']:.2f}.")
 
 
-def _consultar_saldo(banco):
+def _consultar_saldo():
     numero = _ler_numero_conta("Número da conta: ")
-    saldo = banco.consultar_saldo(numero)
-    print(f"Saldo da conta {numero}: R$ {saldo:.2f}.")
+    dados = _chamar_api("GET", f"/banco/conta/{numero}/saldo")
+    print(f"Saldo da conta {numero}: R$ {dados['saldo']:.2f}.")
 
 
-def _consultar_conta(banco):
+def _consultar_conta():
     numero = _ler_numero_conta("Número da conta: ")
-    dados = banco.consultar_conta(numero)
+    dados = _chamar_api("GET", "/banco/conta/", params={"numero": numero})
     print(f"Tipo: {dados['tipo']}")
     print(f"Número: {dados['numero']}")
     print(f"Saldo: R$ {dados['saldo']:.2f}")
@@ -58,35 +82,51 @@ def _consultar_conta(banco):
         print(f"Bônus: {dados['bonus']}")
 
 
-def _realizar_credito(banco):
+def _realizar_credito():
     numero = _ler_numero_conta("Número da conta: ")
     valor = _ler_valor("Valor do crédito: ")
-    creditar(banco, numero, valor)
-    print(f"Crédito realizado. Saldo atual: R$ {banco.consultar_saldo(numero):.2f}.")
+    dados = _chamar_api(
+        "PUT",
+        f"/banco/conta/{numero}/credito",
+        json={"valor": valor},
+    )
+    print(f"Crédito realizado. Saldo atual: R$ {dados['saldo']:.2f}.")
 
 
-def _realizar_debito(banco):
+def _realizar_debito():
     numero = _ler_numero_conta("Número da conta: ")
     valor = _ler_valor("Valor do débito: ")
-    debitar(banco, numero, valor)
-    print(f"Débito realizado. Saldo atual: R$ {banco.consultar_saldo(numero):.2f}.")
+    dados = _chamar_api(
+        "PUT",
+        f"/banco/conta/{numero}/debito",
+        json={"valor": valor},
+    )
+    print(f"Débito realizado. Saldo atual: R$ {dados['saldo']:.2f}.")
 
 
-def _realizar_transferencia(banco):
+def _realizar_transferencia():
     origem = _ler_numero_conta("Conta de origem: ")
     destino = _ler_numero_conta("Conta de destino: ")
     valor = _ler_valor("Valor da transferência: ")
-    transferir(banco, origem, destino, valor)
+    _chamar_api(
+        "PUT",
+        "/banco/conta/transferencia",
+        json={"from": origem, "to": destino, "amount": valor},
+    )
     print("Transferência realizada com sucesso.")
 
 
-def _render_juros(banco):
+def _render_juros():
     numero = _ler_numero_conta("Número da conta Poupança: ")
     taxa = _ler_valor("Taxa de juros (%): ")
-    banco.render_juros(numero, taxa)
+    dados = _chamar_api(
+        "PUT",
+        "/banco/conta/rendimento",
+        json={"numero": numero, "taxa": taxa},
+    )
     print(
         f"Juros aplicados com sucesso. Saldo atual: "
-        f"R$ {banco.consultar_saldo(numero):.2f}."
+        f"R$ {dados['saldo']:.2f}."
     )
 
 
@@ -103,7 +143,6 @@ def _mostrar_menu():
 
 
 def executar_menu():
-    banco = BancoBase()
     operacoes = {
         "1": _cadastrar_conta,
         "2": _consultar_saldo,
@@ -124,6 +163,6 @@ def executar_menu():
             print("Opção inválida.")
             continue
         try:
-            operacao(banco)
+            operacao()
         except ValueError as erro:
             print(f"Operação não realizada: {erro}")
