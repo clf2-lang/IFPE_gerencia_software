@@ -22,6 +22,7 @@ class BancoBase:
 
         self.contas.append(conta)
         return conta
+
     
     def localizar_conta(self, numero):
         numero = str(numero).strip()
