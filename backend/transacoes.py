@@ -1,47 +1,44 @@
+from backend.banco_base import BancoBase
+
 
 def creditar(banco, numero, valor):
-    # Verifica se o valor é positivo antes de creditar
     if valor <= 0:
-        raise ValueError("O valor deve ser maior que zero.")
+        raise ValueError("O valor do crédito deve ser positivo.")
 
     conta = banco.localizar_conta(numero)
     conta.saldo += valor
 
-    # Conta Bônus ganha 1 ponto a cada R$ 100 depositados
     if hasattr(conta, "pontuacao"):
         conta.pontuacao += int(valor / 100)
 
 
 def debitar(banco, numero, valor):
-    # Verifica se há saldo suficiente antes de debitar o valor
     if valor <= 0:
-        raise ValueError("O valor deve ser maior que zero.")
+        raise ValueError("O valor do débito deve ser positivo.")
 
     conta = banco.localizar_conta(numero)
 
-    if conta.saldo < valor:
-        raise ValueError("Saldo insuficiente para debitar o valor solicitado.")
+    if conta.saldo - valor < getattr(conta, "limite", 0.0):
+        raise ValueError("O limite de saldo negativo foi ultrapassado.")
 
     conta.saldo -= valor
 
 
 def transferir(banco, origem, destino, valor):
-    # Verifica se o valor é positivo antes de transferir
     if valor <= 0:
-        raise ValueError("O valor deve ser maior que zero.")
+        raise ValueError("O valor da transferência deve ser positivo.")
 
     if str(origem).strip() == str(destino).strip():
-        raise ValueError("As contas devem ser diferentes.")
+        raise ValueError("A conta de origem e destino devem ser diferentes.")
 
     conta_origem = banco.localizar_conta(origem)
     conta_destino = banco.localizar_conta(destino)
 
-    if conta_origem.saldo < valor:
-        raise ValueError("Saldo insuficiente para transferir o valor solicitado.")
+    if conta_origem.saldo - valor < getattr(conta_origem, "limite", 0.0):
+        raise ValueError("O limite de saldo negativo foi ultrapassado.")
 
     conta_origem.saldo -= valor
     conta_destino.saldo += valor
 
-    # Conta Bônus ganha 1 ponto a cada R$ 150 recebidos
     if hasattr(conta_destino, "pontuacao"):
-        conta_destino.pontuacao += int(valor / 150)
+        conta_destino.pontuacao += int(valor / 200)

@@ -1,10 +1,11 @@
 from backend.conta import Conta, ContaBonus, ContaPoupanca
 
+
 class BancoBase:
     def __init__(self):
         self.contas = []
 
-    def cadastrar_conta(self, numero, tipo, saldo_inicial):
+    def cadastrar_conta(self, numero, tipo, saldo_inicial=0.0):
         numero = str(numero).strip()
         if not numero:
             raise ValueError("O número da conta não pode ficar vazio.")
@@ -16,13 +17,13 @@ class BancoBase:
         elif tipo == "bonus":
             conta = ContaBonus(numero)
         elif tipo == "poupanca":
-            conta = ContaPoupanca(numero)
+            conta = ContaPoupanca(numero, saldo_inicial)
         else:
             raise ValueError("Tipo de conta inválido.")
 
         self.contas.append(conta)
         return conta
-    
+
     def localizar_conta(self, numero):
         numero = str(numero).strip()
         for conta in self.contas:
@@ -32,6 +33,27 @@ class BancoBase:
 
     def consultar_saldo(self, numero):
         return self.localizar_conta(numero).saldo
+
+    def consultar_conta(self, numero):
+        conta = self.localizar_conta(numero)
+
+        if isinstance(conta, ContaBonus):
+            tipo = "bonus"
+        elif isinstance(conta, ContaPoupanca):
+            tipo = "poupanca"
+        else:
+            tipo = "corrente"
+
+        dados = {
+            "tipo": tipo,
+            "numero": conta.numero,
+            "saldo": conta.saldo,
+        }
+
+        if hasattr(conta, "pontuacao"):
+            dados["bonus"] = conta.pontuacao
+
+        return dados
 
     def render_juros(self, numero, taxa):
         conta = self.localizar_conta(numero)
