@@ -1,5 +1,6 @@
 from backend.conta import Conta, ContaBonus, ContaPoupanca
 
+
 class BancoBase:
     def __init__(self):
         self.contas = []
@@ -12,7 +13,7 @@ class BancoBase:
             raise ValueError("Já existe uma conta com esse número.")
 
         if tipo == "corrente":
-            conta = Conta(numero)
+            conta = Conta(numero, saldo_inicial)
         elif tipo == "bonus":
             conta = ContaBonus(numero)
         elif tipo == "poupanca":
@@ -22,7 +23,7 @@ class BancoBase:
 
         self.contas.append(conta)
         return conta
-    
+
     def localizar_conta(self, numero):
         numero = str(numero).strip()
         for conta in self.contas:
